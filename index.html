@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberShield – Interactive Cyber Security Awareness Simulator</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- LOADING SCREEN -->
+<div id="loading">
+  <h1>CYBERSHIELD</h1>
+  <div class="load-bar"><div class="load-fill" id="load-fill"></div></div>
+  <div class="load-text" id="load-text">INITIALIZING SECURITY PROTOCOLS...</div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <nav>
+    <div class="nav-logo">CYBER<span>SHIELD</span></div>
+    <button class="nav-menu-btn" id="nav-menu-btn" aria-label="Toggle menu">☰</button>
+    <div class="nav-stats" id="nav-stats">
+      <div class="nav-stat">
+        <div class="nav-stat-val" id="nav-score">0</div>
+        <div class="nav-stat-label">Score</div>
+        <div class="xp-bar-wrap nav-xp-wrap"><div class="xp-bar-fill" id="xp-bar"></div></div>
+      </div>
+      <div class="nav-stat">
+        <div class="nav-stat-val" id="nav-level">-</div>
+        <div class="nav-stat-label">Level</div>
+      </div>
+      <div class="nav-stat">
+        <div class="nav-stat-val nav-diff-val" id="nav-difficulty">INT</div>
+        <div class="nav-stat-label">Mode</div>
+      </div>
+      <button id="theme-toggle">☀ LIGHT</button>
+    </div>
+  </nav>
+
+  <!-- HOME -->
+  <div class="screen active" id="home">
+    <div class="hero-badge">▶ SECURITY TRAINING PLATFORM v2.0</div>
+    <h1 class="hero-title">CyberShield</h1>
+    <p class="hero-sub">Master the art of cyber defense through immersive simulations. Detect phishing, crack passwords, identify fake sites, and repel social engineers.</p>
+    <div class="difficulty-wrap glass-card">
+      <h3 class="difficulty-title">Select Difficulty</h3>
+      <div class="difficulty-buttons" id="difficulty-buttons">
+        <button class="difficulty-btn active" data-action="set-difficulty" data-value="beginner">Beginner</button>
+        <button class="difficulty-btn" data-action="set-difficulty" data-value="intermediate">Intermediate</button>
+        <button class="difficulty-btn" data-action="set-difficulty" data-value="expert">Expert</button>
+      </div>
+    </div>
+    <button class="btn-primary" data-action="show-screen" data-target="levels">⚡ START TRAINING</button>
+    <div class="home-leaderboard-wrap"><button class="btn-secondary" data-action="show-screen" data-target="leaderboard">🏆 Leaderboard</button></div>
+
+    <div class="levels-grid" id="home-levels-grid">
+      <!-- filled by JS -->
+    </div>
+  </div>
+
+  <!-- LEVELS -->
+  <div class="screen" id="levels">
+    <h2 class="screen-title">SELECT MISSION</h2>
+    <p class="screen-subtitle">Complete each level to unlock the next. Earn XP and badges.</p>
+    <div class="levels-grid" id="levels-grid"></div>
+    <div class="section-spacer"></div>
+    <button class="btn-secondary" data-action="show-screen" data-target="home">← Back</button>
+  </div>
+
+  <!-- LEVEL 1: PHISHING -->
+  <div class="screen" id="level1">
+    <div class="level-header">
+      <div class="level-badge">LEVEL 01</div>
+      <div class="level-title">Phishing Detection</div>
+      <div class="timer-display" id="timer1">⏱ 60s</div>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill" id="prog1"></div></div>
+    <div id="phish-question-area"></div>
+  </div>
+
+  <!-- LEVEL 2: PASSWORD -->
+  <div class="screen" id="level2">
+    <div class="level-header">
+      <div class="level-badge">LEVEL 02</div>
+      <div class="level-title">Password Strength</div>
+      <div class="timer-display" id="timer2">⏱ 90s</div>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill" id="prog2"></div></div>
+    <div class="glass-card">
+      <div class="card-title">🔐 Password Strength Analyzer</div>
+      <div class="card-sub">Create a strong password that passes all security checks, then submit to score points.</div>
+      <div class="pwd-input-wrap">
+        <input type="password" class="pwd-input" id="pwd-field" placeholder="Enter a password...">
+        <span class="pwd-toggle" id="pwd-toggle">👁</span>
+      </div>
+      <div class="strength-meter"><div class="strength-fill" id="strength-fill"></div></div>
+      <div class="strength-label" id="strength-label">Enter a password</div>
+      <div class="pwd-checks" id="pwd-checks"></div>
+      <div class="crack-time" id="crack-time">⚡ Estimated crack time: <span class="crack-val" id="crack-val">—</span></div>
+      <button class="btn-primary btn-disabled" id="pwd-submit" data-action="submit-password">Submit Password</button>
+    </div>
+  </div>
+
+  <!-- LEVEL 3: FAKE WEBSITE -->
+  <div class="screen" id="level3">
+    <div class="level-header">
+      <div class="level-badge">LEVEL 03</div>
+      <div class="level-title">Fake Website Detection</div>
+      <div class="timer-display" id="timer3">⏱ 75s</div>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill" id="prog3"></div></div>
+    <div class="glass-card card-margin-bottom">
+      <div class="card-title">🕵️ Find the Vulnerabilities</div>
+      <p class="vuln-instruction">Click on all suspicious elements in the fake website below. Find all <span id="vuln-count">5</span> vulnerabilities!</p>
+      <div class="vulns-list" id="vulns-list"></div>
+    </div>
+    <div class="fake-browser" id="fake-browser">
+      <div class="fake-browser-bar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="url-bar">
+          <span class="url-http" id="url-http" data-action="find-vuln" data-vuln="http" title="Click vulnerabilities!">http://</span>
+          <span class="url-domain" id="url-domain">paypa1-secure-login.net/account/verify</span>
+        </div>
+      </div>
+      <div class="fake-site-body">
+        <div class="fake-login">
+          <div class="fake-logo">💳</div>
+          <div class="fake-site-title" id="fake-site-title">PayPa1 Secure Center</div>
+          <div class="fake-tagline" id="fake-tagline" data-action="find-vuln" data-vuln="typo">Your trusted paymant partner since 1998</div>
+          <input type="email" class="fake-input" placeholder="Email Address" readonly>
+          <input type="password" class="fake-input" placeholder="Password" readonly>
+          <button class="fake-submit" id="fake-submit" data-action="find-vuln" data-vuln="form">Sign In to Your Acount</button>
+          <div class="fake-footer" id="fake-footer" data-action="find-vuln" data-vuln="footer">© 2019 PayPa1 Inc. All rights reserves. | Privacy Plicy | Terms of Survice</div>
+          <div class="cert-warning" id="cert-warning" data-action="find-vuln" data-vuln="cert">🔓 This connection is not secure</div>
+        </div>
+      </div>
+    </div>
+    <div id="l3-submit-wrap" class="l3-submit-wrap">
+      <button class="btn-primary" data-action="submit-l3">Submit Findings</button>
+    </div>
+  </div>
+
+  <!-- LEVEL 4: SOCIAL ENGINEERING -->
+  <div class="screen" id="level4">
+    <div class="level-header">
+      <div class="level-badge">LEVEL 04</div>
+      <div class="level-title">Social Engineering</div>
+      <div class="timer-display" id="timer4">⏱ 120s</div>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill" id="prog4"></div></div>
+    <div id="social-area"></div>
+  </div>
+
+  <!-- BONUS: NETWORK -->
+  <div class="screen" id="levelB">
+    <div class="level-header">
+      <div class="level-badge">BONUS</div>
+      <div class="level-title">Network Identification</div>
+      <div class="timer-display" id="timerB">⏱ 60s</div>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill" id="progB"></div></div>
+    <div id="network-area"></div>
+  </div>
+
+  <!-- FINAL REPORT -->
+  <div class="screen" id="final-screen">
+    <h1 class="final-title">Mission Complete!</h1>
+    <div id="rank-display"></div>
+    <div class="final-stats">
+      <div class="final-stat"><div class="final-stat-val" id="fs-score">0</div><div class="final-stat-label">Total Score</div></div>
+      <div class="final-stat"><div class="final-stat-val" id="fs-correct">0</div><div class="final-stat-label">Correct</div></div>
+      <div class="final-stat"><div class="final-stat-val" id="fs-accuracy">0%</div><div class="final-stat-label">Accuracy</div></div>
+      <div class="final-stat"><div class="final-stat-val" id="fs-risk">0%</div><div class="final-stat-label">Risk Awareness</div></div>
+      <div class="final-stat"><div class="final-stat-val" id="fs-time">0s</div><div class="final-stat-label">Avg Time</div></div>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="skill-chart" width="400" height="220"></canvas>
+    </div>
+    <h3 class="tips-title">🛡️ Personalized Security Tips</h3>
+    <div class="tips-grid" id="tips-grid"></div>
+    <div class="final-actions">
+      <button class="btn-primary" data-action="download-cert">📜 Download Certificate</button>
+      <button class="btn-secondary" data-action="restart-game">🔄 Restart</button>
+      <button class="btn-secondary" data-action="show-screen" data-target="leaderboard">🏆 Leaderboard</button>
+    </div>
+    <canvas id="cert-canvas" width="900" height="600"></canvas>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div class="screen" id="leaderboard">
+    <h2 class="screen-title">🏆 Leaderboard</h2>
+    <p class="screen-subtitle">Top agents worldwide</p>
+    <div class="glass-card">
+      <div id="lb-list"></div>
+    </div>
+    <div class="leaderboard-actions">
+      <button class="btn-secondary" data-action="show-screen" data-target="home">← Home</button>
+      <button class="btn-secondary" data-action="clear-leaderboard">Clear Board</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <div class="modal-icon" id="modal-icon"></div>
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-points" id="modal-points"></div>
+    <button class="btn-primary" id="modal-btn" data-action="close-modal">Continue →</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
